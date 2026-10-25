@@ -39,5 +39,5 @@ Placeholder for generated or hand-written API reference.
 
 :::{note}
 To rebrand, edit `conf.py` (project name, logo paths, github_user/repo),
-`_templates/gz-navbar-nav.html` (navbar links), and `css/gazebo.css` (colours).
+`_templates/navbar-nav.html` (navbar links), and `css/gazebo.css` (colours).
 :::

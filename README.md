@@ -15,9 +15,9 @@ machinery, replacing them with a handful of sample pages.
 | `getting_started.md` | Code blocks with copy buttons, callouts |
 | `tutorials.md` | Task lists (`- [ ]`) and admonitions (`{note}`, `{tip}`, `{danger}`) |
 | `api.md` | API reference placeholder |
-| `_templates/gz-sidebar-nav.html` | Sidebar driven by a toctree named `sidebar` |
-| `_templates/gz-navbar-nav.html` | Placeholder top-nav links (edit me) |
-| `_templates/gz-footer.html` | Generic footer |
+| `_templates/sidebar-nav.html` | Sidebar driven by a toctree named `sidebar` |
+| `_templates/navbar-nav.html` | Placeholder top-nav links (edit me) |
+| `_templates/footer.html` | Generic footer |
 | `_static/css/gazebo.css` | CSS overrides — rebrand colours here |
 | `_static/images/logos/` | Placeholder light/dark SVG logos |
 | `requirements.txt` | Python build dependencies |
@@ -44,8 +44,8 @@ python -m http.server -d _build/html
    `logo` entry in `html_theme_options`.
 3. **Colours** — edit `_static/css/gazebo.css` (root CSS custom properties
    drive the theme's accents).
-4. **Navbar** — replace the placeholder links in `_templates/gz-navbar-nav.html`.
-5. **Footer** — adjust `_templates/gz-footer.html`.
+4. **Navbar** — replace the placeholder links in `_templates/navbar-nav.html`.
+5. **Footer** — adjust `_templates/footer.html`.
 6. **"Edit this page"** — point `github_user` / `github_repo` / `github_version`
    in `conf.py` at your repo, or set `use_edit_page_button` to `False`.
 7. **Content** — delete the sample `.md` files, add your own, and list them in

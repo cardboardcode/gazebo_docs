@@ -80,10 +80,10 @@ html_theme_options = {
     "show_toc_level": 1,
     "navigation_with_keys": False,
     "show_prev_next": False,
-    "footer_center": ["gz-footer"],
+    "footer_center": ["footer"],
     "secondary_sidebar_items": ["page-toc"],
     "navbar_align": "left",
-    "navbar_center": ["gz-navbar-nav"],
+    "navbar_center": ["navbar-nav"],
     "navbar_end": ["navbar-icon-links", "theme-switcher"],
     "pygments_light_style": "tango",
     "pygments_dark_style": "monokai",
@@ -96,10 +96,10 @@ html_theme_options = {
     "show_version_warning_banner": False,
 }
 
-# The sidebar is driven by _templates/gz-sidebar-nav.html, which renders a
+# The sidebar is driven by _templates/sidebar-nav.html, which renders a
 # toctree explicitly named "sidebar" (see index.md).
-html_sidebars = {"**": ["gz-sidebar-nav"]}
-html_sidebar = "gz-sidebar-nav"
+html_sidebars = {"**": ["sidebar-nav"]}
+html_sidebar = "sidebar-nav"
 
 # "Edit this page" button: point these at your own repo (or set
 # "use_edit_page_button": False to hide the button entirely).

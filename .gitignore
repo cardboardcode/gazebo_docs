@@ -1,3 +1,6 @@
-.build
-.tmp
-.venv
+_build/
+.build/
+.tmp/
+__pycache__/
+*.pyc
+.venv/

@@ -1,9 +1,6 @@
 myst-parser[linkify]
 pydata-sphinx-theme
-pyyaml
 sphinx
 sphinx-copybutton
 sphinx-design
-requests
-sphinxcontrib-googleanalytics
-sphinxcontrib-mermaid
+# sphinxcontrib-mermaid   # optional: diagrams via ```mermaid fences (enable in conf.py)

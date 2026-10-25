@@ -1,171 +1,112 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2024 Open Source Robotics Foundation
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# Sphinx configuration for the generic documentation template.
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-# Configuration file for the Sphinx documentation builder.
+# Derived from gazebosim/docs (https://github.com/gazebosim/docs): it keeps the
+# visual look (pydata-sphinx-theme + custom CSS + custom navbar/sidebar/footer
+# templates) but strips all the Gazebo-specific and multi-release build
+# machinery, leaving a single, self-contained config.
 #
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-import json
-import sys
-from pathlib import Path
-import yaml
 
+project = "Docs Template"
+author = "Your Org"
+copyright = "2026, Your Org"
 
-from sphinx.application import Sphinx
-from sphinx.config import Config
-from pygments.lexers.shell import BatchLexer
+version = "0.1"   # The short X.Y version, e.g. "1.0"
+release = "0.1"   # The full version, e.g. "1.0.3"
 
+# -- General configuration ---------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-sys.path.append(str(Path(__file__).parent))
-import build_utils
-from base_conf import *  # noqa
+extensions = [
+    "myst_parser",
+    "sphinx_copybutton",
+    "sphinx_design",
+    # "sphinxcontrib.mermaid",  # optional: re-enable + uncomment myst_fence_as_directive below
+]
 
-html_baseurl = f"{html_context['deploy_url']}/docs/latest/"  # noqa
+templates_path = ["_templates"]
 
-html_context.update({
-    "github_user": "gazebosim",
-    "github_repo": "docs",
-    "github_version": "master",
-    "edit_page_url_template": "{{ github_url }}/{{ github_user }}/{{ github_repo }}"
-    "/edit/{{ github_version }}/{{ get_file_from_map(file_name) }}",
+source_suffix = {
+    ".md": "markdown",
+}
+
+# Don't ingest package READMEs / dist-info files that live under a local venv
+# as "documents" — they would each emit a "not in any toctree" warning.
+exclude_patterns = [
+    "_build", "Thumbs.db", ".DS_Store", ".venv", ".tmp", ".build",
+    "README.md", ".codespell",
+]
+
+myst_heading_anchors = 4
+
+myst_enable_extensions = [
+    "attrs_inline",
+    "attrs_block",
+    "colon_fence",
+    "deflist",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "linkify",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
+]
+
+# myst_fence_as_directive = ["mermaid"]  # enable together with sphinxcontrib.mermaid
+
+# Be forgiving about unresolved references; tighten to True once links are clean.
+nitpicky = False
+
+# -- Options for HTML output -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+
+html_theme = "pydata_sphinx_theme"
+html_static_path = ["_static"]
+html_css_files = ["css/gazebo.css"]
+html_favicon = "_static/icon/favicon.ico"
+
+html_theme_options = {
+    "header_links_before_dropdown": 4,
+    "use_edit_page_button": True,
+    "show_toc_level": 1,
+    "navigation_with_keys": False,
+    "show_prev_next": False,
+    "footer_center": ["gz-footer"],
+    "secondary_sidebar_items": ["page-toc"],
+    "navbar_align": "left",
+    "navbar_center": ["gz-navbar-nav"],
+    "navbar_end": ["navbar-icon-links", "theme-switcher"],
+    "pygments_light_style": "tango",
+    "pygments_dark_style": "monokai",
+    # TODO: replace with your project logo (SVGs live in _static/images/logos/)
+    "logo": {
+        "image_light": "_static/images/logos/logo_light.svg",
+        "image_dark": "_static/images/logos/logo_dark.svg",
+    },
+    "check_switcher": False,
+    "show_version_warning_banner": False,
+}
+
+# The sidebar is driven by _templates/gz-sidebar-nav.html, which renders a
+# toctree explicitly named "sidebar" (see index.md).
+html_sidebars = {"**": ["gz-sidebar-nav"]}
+html_sidebar = "gz-sidebar-nav"
+
+# "Edit this page" button: point these at your own repo (or set
+# "use_edit_page_button": False to hide the button entirely).
+html_context = {
+    "github_user": "your-org",            # TODO: your GitHub org/user
+    "github_repo": "your-docs",           # TODO: your documentation repo name
+    "github_version": "main",             # TODO: the branch holding the docs
+    "edit_page_url_template": "{{ github_url }}/{{ github_user }}/{{ github_repo }}/edit/{{ github_version }}/{{ doc_path }}",
     "edit_page_provider_name": "GitHub",
-})
-
-
-def setup_file_map(app: Sphinx, pagename: str, templatename: str, context, doctree):
-    def get_file_from_map(file_name: str):
-        source_manifest = context["source_manifest"]
-        result = context["file_name_map"].get(Path(file_name).stem)
-
-        if result:
-            return source_manifest.get(result, file_name)
-        # Fallback for non-markdown files or files not in the manifest
-        return source_manifest.get(file_name, file_name)
-
-    context["get_file_from_map"] = get_file_from_map
-
-
-def load_releases(index_file):
-    with open(index_file) as top_index_file:
-        gz_nav_yaml = yaml.safe_load(top_index_file)
-
-    return dict([(release["name"], release) for release in gz_nav_yaml["releases"]])
-
-
-def get_preferred_release(releases: dict):
-    preferred = [rel for rel in releases.values() if rel.get("preferred", False)]
-    assert len(preferred) == 1
-    return preferred[0]
-
-
-def create_file_rename_map(nav_yaml_pages):
-    file_name_map = {}
-
-    for page in nav_yaml_pages:
-        if "file" in page:
-            file_name_map[page["name"]] = page['file'].removeprefix("common:")
-
-        children = page.get("children")
-        if children:
-            file_name_map.update(create_file_rename_map(children))
-
-    return file_name_map
-
-
-def config_init(app: Sphinx, config: Config):
-    if not config.gz_release:
-        raise RuntimeError("gz_release not provided")
-    config.release = config.gz_release  # type: ignore
-    config.version = config.gz_release  # type: ignore
-
-    # Load the file map generated by the build script.
-    # This map is used to power the "Edit on GitHub" links.
-    file_name_map = {}
-    map_path = Path(app.srcdir) / 'source_manifest.json'
-    with open(map_path) as f:
-        source_manifest = json.load(f)
-    build_utils.register_yaml_include(Path(config.gz_root_index_file).parent)
-    flatten_navigation = build_utils.flatten_navigation
-
-    with open(Path(app.srcdir) / "index.yaml") as f:
-        file_name_map.update(
-            create_file_rename_map(flatten_navigation(yaml.safe_load(f)["pages"]))
-        )
-
-    config.html_context["file_name_map"] = file_name_map
-    config.html_context["source_manifest"] = source_manifest
-
-    # We've disabled "check_switcher" since it doesn't play well with our directory structure.
-    # So we check for the existence of switcher.json here
-    #
-    assert Path(f"{app.srcdir}/_static/switcher.json").exists()
-    config.html_theme_options["switcher"] = {
-        "json_url": f"{html_context['deploy_url']}/docs/{config.gz_release}/_static/switcher.json",
-        "version_match": config.gz_release,
-    }
-
-    try:
-        releases = load_releases(config.gz_root_index_file)
-        release_info = releases[config.gz_release]
-        app.config.html_context["release_info"] = release_info
-        
-        # Generate libraries list for substitution
-        libraries = release_info.get('libraries', [])
-        sim_version = None
-        for lib in libraries:
-            if lib['name'] == 'sim':
-                sim_version = lib['version']
-                break
-        
-        gz_sim_link = f"- [Sim](/api/sim/{sim_version}/tutorials.html){{.external}}" if sim_version else ""
-        
-        libs_list = []
-        for lib in sorted(libraries, key=lambda l: l['name']):
-            if lib['name'] == 'sim':
-                continue
-            name_cap = lib['name'].capitalize()
-            if lib['name'] == 'sdformat':
-                libs_list.append(f"- [{name_cap}](/api/sdformat/{lib['version']}/){{.external}}")
-            else:
-                libs_list.append(f"- [{name_cap}](/api/{lib['name']}/{lib['version']}/tutorials.html){{.external}}")
-        
-        libs_str = "\n".join(libs_list)
-        
-        config.myst_substitutions = {
-            "gz_sim_link": gz_sim_link,
-            "libraries_list": libs_str,
-        }
-
-        app.config.html_context["preferred_release"] = get_preferred_release(releases)
-        if release_info.get('eol', False):
-            print(f"Disable nitpicky for {release_info['name']}")
-            app.config.nitpick_ignore_regex.append(("myst", r".*"))
-
-    except KeyError as e:
-        print(e)
-        raise RuntimeError(
-            f"Provided gz_release '{config.gz_release}' not registered in `index.yaml`"
-        )
-
-
-def setup(app: Sphinx):
-    app.add_config_value("gz_release", "", rebuild="env", types=[str])
-    app.add_config_value("gz_root_index_file", "", rebuild="env", types=[str])
-    app.connect("html-page-context", setup_file_map)
-    app.connect("config-inited", config_init)
-    app.add_lexer("cmd", BatchLexer)
+}

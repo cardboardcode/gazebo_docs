@@ -1,130 +1,61 @@
-# Gazebo Documentation
+# Docs Template
 
-This repository contains documentation about [Gazebo](https://gazebosim.org) that does not pertain to a specific
-[Gazebo library](https://gazebosim.org/libs). An example would be
-installation instructions for an Gazebo release. The documentation
-contained in this repository can be view at
-[https://gazebosim.org/docs](https://gazebosim.org/docs).
+A reusable documentation starter built on **Sphinx** + **MyST Markdown** +
+**pydata-sphinx-theme**, derived from the [Gazebo Sim docs](https://github.com/gazebosim/docs).
+It keeps the full look (custom CSS, sidebar, navbar and footer templates)
+while stripping all Gazebo-specific content and the multi-release build
+machinery, replacing them with a handful of sample pages.
 
-Each [Gazebo library](https://gazebosim.org/libs) maintains
-documentation and tutorials that are scoped to the features and
-capabilities of the library itself. The documentation for a library can be
-found under the `API Reference` section of [https://gazebosim.org/docs](https://gazebosim.org/docs).
+## What's inside
 
-## Documentation Structure
+| Path | Purpose |
+|------|---------|
+| `conf.py` | Single, self-contained Sphinx configuration |
+| `index.md` | Landing page, design grid, and the `main` + `sidebar` toctrees |
+| `getting_started.md` | Code blocks with copy buttons, callouts |
+| `tutorials.md` | Task lists (`- [ ]`) and admonitions (`{note}`, `{tip}`, `{danger}`) |
+| `api.md` | API reference placeholder |
+| `_templates/gz-sidebar-nav.html` | Sidebar driven by a toctree named `sidebar` |
+| `_templates/gz-navbar-nav.html` | Placeholder top-nav links (edit me) |
+| `_templates/gz-footer.html` | Generic footer |
+| `_static/css/gazebo.css` | CSS overrides — rebrand colours here |
+| `_static/images/logos/` | Placeholder light/dark SVG logos |
+| `requirements.txt` | Python build dependencies |
 
-The documentation is organized by Gazebo release version, with shared files located in a root-level `common` directory.
-
-### Repository Layout
-
-- **`common/`**: Contains markdown files and folders that are shared across all Gazebo releases (e.g., installation overviews, architecture guides, governance documents, etc.).
-- **`<release_name>/`** (e.g., `jetty/`): Contains markdown files specific to a particular release and its specific `index.yaml`.
-
-### Release Navigation Menu (`index.yaml`)
-
-Navigation menus are defined per-release in the release directory's `index.yaml` (e.g., `jetty/index.yaml`). The top-level `index.yaml` only contains global release metadata and library information, not navigation definitions.
-
-#### Organizing Pages with Sections
-
-The `pages` key in the release `index.yaml` defines the menu hierarchy using the `section` key to group related items.
-
-Example:
-
-```yaml
-pages:
-  - section: Get Started
-    children:
-      - name: getstarted
-        title: Get Started
-        file: common:get_started.md
-      - name: release_notes
-        title: Release Notes
-        file: release_notes.md
-```
-
-#### Shared Files Prefix (`common:`)
-
-To reference a file from the root-level `common` directory in a release-specific `index.yaml`, use the `common:` prefix in the `file` attribute.
-
-```yaml
-- name: getstarted
-  title: Get Started
-  file: common:get_started.md
-```
-
-Files without the prefix are assumed to be relative to the release directory.
-
-#### Reusing Common Navigation Items (`!include`)
-
-To avoid duplication across versioned `index.yaml` files, you can use the `!include` tag to include shared lists of navigation items from the `common/` directory.
-
-Example:
-```yaml
-- section: Reference
-  children:
-    - !include common/nav_reference.yaml
-    - name: release_notes
-      title: Release Notes
-      file: release_notes.md
-```
-The build script will resolve the `!include` tag and flatten the list, effectively merging the shared items with any release-specific items listed before or after it.
-
-#### Organizational Elements
-
-If an entry in `index.yaml` has children but no `file` entry, it is considered an organizational element. The build script will automatically create a placeholder page for Sphinx to group the children under.
-
-## Main docs
-
-The documentation in this repository is built using [Sphinx](https://www.sphinx-doc.org/).
-To build, you need to install the following:
-
-* python virtualenv
-
-Create the virtual env and activate it:
+## Getting started
 
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate
-```
-
-Then install the necessary dependencies:
-
-```bash
+. .venv/bin/activate
 pip install -r requirements.txt
+
+# build the site
+sphinx-build -b html . _build/html
+
+# preview
+python -m http.server -d _build/html
+# → http://localhost:8000
 ```
 
-```bash
-python3 build_multiversion.py
-```
+## Rebranding
 
-This will build all the documentation for all versions of Gazebo.
-You can preview the result locally by running an HTTP server on
-the output directory `.build`. For example:
+1. **Project identity** — set `project`, `author` and `copyright` in `conf.py`.
+2. **Logo** — drop your SVGs into `_static/images/logos/` and update the
+   `logo` entry in `html_theme_options`.
+3. **Colours** — edit `_static/css/gazebo.css` (root CSS custom properties
+   drive the theme's accents).
+4. **Navbar** — replace the placeholder links in `_templates/gz-navbar-nav.html`.
+5. **Footer** — adjust `_templates/gz-footer.html`.
+6. **"Edit this page"** — point `github_user` / `github_repo` / `github_version`
+   in `conf.py` at your repo, or set `use_edit_page_button` to `False`.
+7. **Content** — delete the sample `.md` files, add your own, and list them in
+   **both** the visible toctree and the hidden `sidebar` toctree in
+   `index.md`.
 
-```bash
-python3 -m http.server 8000 -d .build
+## Notes
 
-```
-
-This will serve the website on <http://localhost:8000>
-
-For quicker iteration, you can build the documentation for a subset
-of Gazebo versions. To build `garden` and `harmonic`:
-
-```bash
-python3 build_multiversion.py --release garden harmonic
-```
-
-## Spell checking
-
-The Markdown documentation is spell-checked with
-[codespell](https://github.com/codespell-project/codespell), run by the GitHub
-Actions workflow [.github/workflows/codespell.yml](.github/workflows/codespell.yml).
-
-For configuration, how to run the check locally, and how to add words, see
-[.codespell/README.md](.codespell/README.md).
-
-## Library docs
-
-Instructions on how to update all of the library docs is contained in the
-[tools/build_docs.sh](https://github.com/gazebosim/docs/blob/master/tools/build_docs.sh) script.
+- The sidebar navigation is driven by an explicitly named toctree
+  (`toctrees = {"sidebar": ...}` in `conf.py` + matching hidden toctree in
+  `index.md`) — there is no multi-version machinery.
+- Optional extras commented out in `requirements.txt` / `conf.py`:
+  `sphinxcontrib.mermaid`, `sphinxcontrib.googleanalytics`.

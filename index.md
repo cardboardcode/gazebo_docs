@@ -12,20 +12,28 @@ api
 :::
 
 :::{grid} 1 1 2 3
+:::{grid-row}
+:::{grid-item}
 :::{grid-item-card} Get started
 :link: getting_started.html
 
 Prerequisites, installation and a quick tour of the toolchain.
 :::
+:::
+:::{grid-item}
 :::{grid-item-card} Tutorials
 :link: tutorials.html
 
 Hands-on examples with callouts and task lists.
 :::
+:::
+:::{grid-item}
 :::{grid-item-card} API
 :link: api.html
 
 Placeholder for generated or hand-written API reference.
+:::
+:::
 :::
 :::
 
